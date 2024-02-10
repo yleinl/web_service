@@ -3,95 +3,48 @@ import models
 from utils import generate_short_id
 
 
-def create_short_url(db: Session, url: str):
-    """
-    Checks if a short URL for the given long URL already exists. If not,
-    generates a unique short ID and creates a new short URL entry in the database.
+url_store = {}
 
-    :param db: Database session for executing queries.
-    :param url: The given URL to be shortened.
-    :return: The existing or newly created short URL object.
-    """
-    # check if the short url object already exist, if true, return it
-    existing_shorter = db.query(models.UrlShorten).filter(models.UrlShorten.long_url == url).first()
-    if existing_shorter:
-        return existing_shorter
+
+def create_short_url(url: str):
+    global url_store
+    for short_id, url_info in url_store.items():
+        if url_info['long_url'] == url:
+            return url_info
     attempt = 0
     length = 8
     while True:
         url_id = generate_short_id(url, length, attempt)
-        # detect collision
-        if not db.query(models.UrlShorten).filter(models.UrlShorten.id == url_id).first():
-            db_url = models.UrlShorten(id=url_id, long_url=url)
-            db.add(db_url)
-            db.commit()
-            db.refresh(db_url)
-            return db_url
-        # concatenate the attempt number to avoid collision
+        if url_id not in url_store:
+            url_store[url_id] = {'id': url_id, 'long_url': url}
+            return url_store[url_id]
         attempt += 1
 
 
-def get_short_url_by_id(db: Session, urlid: str):
-    """
-        Retrieves a short URL object by its URL ID.
-
-        :param db: Database session for executing queries.
-        :param urlid: The URL ID of the short URL.
-        :return: The short URL object if found, else None.
-    """
-    return db.query(models.UrlShorten).filter(models.UrlShorten.id == urlid).first()
+def get_short_url_by_id(urlid: str):
+    return url_store.get(urlid, None)
 
 
-def update_long_url_by_id(db: Session, url_id: str, new_url: str):
-    """
-    Updates the long URL of an existing id in the database.
-
-    :param db: Database session for executing queries.
-    :param url_id: The URL ID to update.
-    :param new_url: The new long URL to associate with the short URL.
-    :return: The updated short URL object if successful, else None.
-    """
-    db_url = db.query(models.UrlShorten).filter(models.UrlShorten.id == url_id).first()
-    if db_url:
-        db_url.long_url = new_url
-        db.commit()
-        db.refresh(db_url)
-        return db_url
+def update_long_url_by_id(url_id: str, new_url: str):
+    if url_id in url_store:
+        url_store[url_id]['long_url'] = new_url
+        return url_store[url_id]
     else:
         return None
 
 
-def delete_short_url(db: Session, url_id: int):
-    """
-    Deletes a short URL entry from the database by its URL ID.
-
-    :param db: Database session for executing queries.
-    :param url_id: The URL ID of the short URL to delete.
-    :return: True if deletion was successful, else False.
-    """
-    db_url = db.query(models.UrlShorten).filter(models.UrlShorten.id == url_id).first()
-    if db_url:
-        db.delete(db_url)
-        db.commit()
+def delete_short_url(url_id: str):
+    if url_id in url_store:
+        del url_store[url_id]
         return True
     else:
         return False
 
 
-def get_all_short_urls(db: Session):
-    # Retrieves all short URL entries from the database.
-    return db.query(models.UrlShorten).all()
+def get_all_short_urls():
+    return list(url_store.values())
 
 
-def delete_all_short_urls(db: Session):
-    # Deletes all short URL entries from the database.
-    try:
-        db.query(models.UrlShorten).delete()
-        db.commit()
-        return True
-    except Exception as e:
-        db.rollback()
-        print(f"Error occurred: {e}")
-        return False
-    finally:
-        db.close()
+def delete_all_short_urls():
+    url_store.clear()
+    return True
