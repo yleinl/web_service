@@ -31,25 +31,27 @@ def update_long_url(url_id):
     if request.is_json:
         data = request.json
         new_url = data.get('url')
+        user_ip = request.remote_addr
         # check first to pass the test
         if not get_short_url_by_id(url_id):
             return jsonify({'error': 'url id not found'}), 404
         if not is_valid_url(new_url):
             return jsonify({'error': 'url invalid'}), 400
-        res = update_long_url_by_id(url_id, new_url)
+        res = update_long_url_by_id(url_id, new_url, user_ip)
         if res:
             return jsonify({'url': new_url}), 200
         else:
-            return jsonify({'error': 'url id not found'}), 404
+            return jsonify({'error': 'url id update not permitted'}), 404
     else:
         # as the request type in tester is not json, but a string
         data = json.loads(request.data.decode('utf-8'))
         new_url = data.get('url')
+        user_ip = request.remote_addr
         if not get_short_url_by_id(url_id):
             return jsonify({'error': 'url id not found'}), 404
         if not is_valid_url(new_url):
             return jsonify({'error': 'url invalid'}), 400
-        res = update_long_url_by_id(url_id, new_url)
+        res = update_long_url_by_id(url_id, new_url, user_ip)
         if res:
             return jsonify({'url': new_url}), 200
         else:
@@ -62,11 +64,12 @@ def delete_long_url(url_id):
     Deletes a short URL entry by its ID.
     Returns a 204 status code on successful deletion, or a 404 if the ID does not exist.
     """
-    res = delete_short_url(url_id)
+    user_ip = request.remote_addr
+    res = delete_short_url(url_id, user_ip)
     if res:
         return jsonify({'message': 'delete success'}), 204
     else:
-        return jsonify({'error': 'url id not found'}), 404
+        return jsonify({'error': 'url id not found or delete not permitted'}), 404
 
 
 @app.route('/', methods=['GET'])
@@ -77,7 +80,7 @@ def get_all():
     """
     short_urls = get_all_short_urls()
     if short_urls:
-        value = "\n".join([f"ID: {url['id']}, Long URL: {url['long_url']}" for url in short_urls])
+        value = "\n".join([f"ID: {url['id']}, Long URL: {url['long_url']}, Created by: {url['user_ip']} \n" for url in short_urls])
         return jsonify({'value': value}), 200
     else:
         return jsonify({'message': 'No URLs found'}), 404
@@ -90,11 +93,12 @@ def create_url_shorten():
     Returns a 201 status code with the new short URL ID on success, or 400 with invalid parameter(format or params).
     """
     if request.is_json:
+        user_ip = request.remote_addr
         data = request.json
         url = data.get('value')
         if not is_valid_url(url):
             return jsonify({'error': 'url invalid'}), 400
-        res = create_short_url(url)
+        res = create_short_url(url, user_ip)
         return jsonify({'id': res['id']}), 201
     else:
         return jsonify({'error': 'parameter incorrect'}), 400
