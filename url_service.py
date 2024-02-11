@@ -28,9 +28,9 @@ def create_short_url(url: str):
 
 def get_short_url_by_id(urlid: str):
     """
-        Retrieves a short URL object by its URL ID.
-        :param urlid: The URL ID of the short URL.
-        :return: The short URL object if found, else None.
+    Retrieves a short URL object by its URL ID.
+    :param urlid: The URL ID of the short URL.
+    :return: The short URL object if found, else None.
     """
     return url_store.get(urlid, None)
 
@@ -53,7 +53,6 @@ def update_long_url_by_id(url_id: str, new_url: str):
 def delete_short_url(url_id: str):
     """
     Deletes a short URL entry from the database by its URL ID.
-
     :param url_id: The URL ID of the short URL to delete.
     :return: True if deletion was successful, else False (URL ID not found).
     """
