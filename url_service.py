@@ -15,12 +15,12 @@ def create_short_url(url: str, user_ip: str):
     :param url: The given URL to be shortened.
     :return: The existing or newly created short URL object.
     """
-    global url_store
+    # global url_store
     for short_id, url_info in url_store.items():
         if url_info['long_url'] == url:
             return url_info
     attempt = 0
-    length = 8
+    length = 6
     with lock:
         while True:
             url_id = generate_short_id(url, length, attempt)

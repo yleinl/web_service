@@ -21,6 +21,14 @@ def base62_encode(num):
     return ''.join(reversed(base62))
 
 
+def hash_encoder(url):
+    url = str(url)
+    hash_value = 0
+    for char in url:
+        hash_value = (hash_value * 31 + ord(char)) % 2**32
+    return hash_value
+
+
 def generate_short_id(url, length=8, attempt=0):
     """
     Generates a unique short ID for a given URL.
@@ -31,8 +39,7 @@ def generate_short_id(url, length=8, attempt=0):
     :return: A short ID based on the URL.
     """
     unique_input = url + str(attempt)
-    hash_obj = hashlib.sha256(unique_input.encode('utf-8'))
-    decimal = int(hash_obj.hexdigest(), 16)
+    decimal = hash_encoder(unique_input.encode('utf-8'))
     short_id = base62_encode(decimal)[:length]
     return short_id
 
@@ -45,11 +52,10 @@ def is_valid_url(url):
     :return: validation result True or False
     """
     regex = re.compile(
-        r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}(?::\d+)?'
-        r'|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}(?::\d+)?'
-        r'|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}(?::\d+)?'
-        r'|www\.[a-zA-Z0-9]+\.[^\s]{2,}(?::\d+)?'
+        r'(https?://[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\.[a-zA-Z]{2,}(?::\d+)?'
+        r'|\b[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\.[a-zA-Z]{2,}(?::\d+)?'
+        r'|https?://[a-zA-Z0-9]+\.[a-zA-Z]{2,}(?::\d+)?'
+        r'|\b[a-zA-Z0-9]+\.[a-zA-Z]{2,}(?::\d+)?'
         r'|localhost(?::\d+)?'
-        r'|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?'
-        r')', re.IGNORECASE)
+        r'|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?)', re.IGNORECASE)
     return re.match(regex, url) is not None
