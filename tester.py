@@ -31,11 +31,11 @@ class TestApi(unittest.TestCase):
         self.id_shortened_url_2 = do_post(self.url_to_shorten_2)
         print("id 2 obtained " + str(self.id_shortened_url_2))
 
-    # def tearDown(self):  # OK
-    #     # erase everything
-    #     endpoint = "/"
-    #     url = f"{self.base_url}{endpoint}"
-    #     response = requests.delete(url)
+    def tearDown(self):  # OK
+        # erase everything
+        endpoint = "/"
+        url = f"{self.base_url}{endpoint}"
+        response = requests.delete(url)
         # self.assertEqual(response.status_code, 404, f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
 
     """
@@ -109,16 +109,16 @@ class TestApi(unittest.TestCase):
     Deletes the given short URL / ID and then returns 204. If the ID does not exist, returns 404
     """
 
-    # def test_deletion_id(self):
-    #     # Erase ID
-    #     endpoint = "/"
-    #     id = self.id_shortened_url_1
-    #     # url = f"{self.base_url}{endpoint}?value={id}"
-    #     url = f"{self.base_url}{endpoint}{id}"
-    #     response = requests.delete(url)
-    #     self.assertEqual(response.status_code, 204, f"Expected status code 204, but got {response.status_code}")
-    #     response = requests.delete(url)
-    #     self.assertEqual(response.status_code, 404, f"Expected status code 404, but got {response.status_code}")
+    def test_deletion_id(self):
+        # Erase ID
+        endpoint = "/"
+        id = self.id_shortened_url_1
+        # url = f"{self.base_url}{endpoint}?value={id}"
+        url = f"{self.base_url}{endpoint}{id}"
+        response = requests.delete(url)
+        self.assertEqual(response.status_code, 204, f"Expected status code 204, but got {response.status_code}")
+        response = requests.delete(url)
+        self.assertEqual(response.status_code, 404, f"Expected status code 404, but got {response.status_code}")
 
     """
     / GET   
@@ -175,19 +175,19 @@ class TestApi(unittest.TestCase):
     Deletes all ID/URL pairs in the service.
     """
 
-    # def test_deletion_all(self):
-    #     # delete all
-    #     endpoint = "/"
-    #     url = f"{self.base_url}{endpoint}"
-    #     response = requests.delete(url)
-    #     self.assertEqual(response.status_code, 404,
-    #                      f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
-    #
-    #     # make a getall to check that stuff is erased
-    #     endpoint = "/"
-    #     url = f"{self.base_url}{endpoint}"
-    #     response = requests.get(url)
-    #     self.assertIsNone(response.json().get("value"), "The value should be None since should be empty.")
+    def test_deletion_all(self):
+        # delete all
+        endpoint = "/"
+        url = f"{self.base_url}{endpoint}"
+        response = requests.delete(url)
+        self.assertEqual(response.status_code, 404,
+                         f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
+
+        # make a getall to check that stuff is erased
+        endpoint = "/"
+        url = f"{self.base_url}{endpoint}"
+        response = requests.get(url)
+        self.assertIsNone(response.json().get("value"), "The value should be None since should be empty.")
 
 
 if __name__ == '__main__':
