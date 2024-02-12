@@ -105,7 +105,11 @@ def create_url_shorten():
             return jsonify({'error': 'parameter invalid'}), 400
         if not is_valid_url(url):
             return jsonify({'error': 'url invalid'}), 400
-        res = create_short_url(url, user_ip)
+        if data.get('length'):
+            res = create_short_url(url, user_ip, data.get('length'))
+        else:
+            # default length is 5
+            res = create_short_url(url, user_ip, 8)
         return jsonify({'id': res['id']}), 201
     else:
         return jsonify({'error': 'parameter incorrect'}), 400

@@ -1,4 +1,3 @@
-import hashlib
 import string
 import re
 BASE62 = string.digits + string.ascii_letters
@@ -29,7 +28,7 @@ def hash_encoder(url):
     return hash_value
 
 
-def generate_short_id(url, length=8, attempt=0):
+def generate_short_id(url, length=5, attempt=0):
     """
     Generates a unique short ID for a given URL.
 
