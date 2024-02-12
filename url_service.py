@@ -6,7 +6,7 @@ url_store = {}
 lock = threading.Lock()
 
 
-def create_short_url(url: str, user_ip: str, len: int):
+def create_short_url(url: str, user_ip: str, id_length: int):
     """
     Checks if a short URL ID for the given long URL already exists. If not,
     generates a new short ID and creates a new short URL entry in the memory.
@@ -21,7 +21,7 @@ def create_short_url(url: str, user_ip: str, len: int):
         if url_info['long_url'] == url:
             return url_info
     attempt = 0
-    length = len
+    length = id_length
     with lock:
         while True:
             url_id = generate_short_id(url, length, attempt)
