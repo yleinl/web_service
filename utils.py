@@ -45,10 +45,11 @@ def is_valid_url(url):
     :return: validation result True or False
     """
     regex = re.compile(
-        r'^(?:http|ftp)s?://'
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # 域名
-        r'localhost|'
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
-        r'(?::\d+)?'
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}(?::\d+)?'
+        r'|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}(?::\d+)?'
+        r'|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}(?::\d+)?'
+        r'|www\.[a-zA-Z0-9]+\.[^\s]{2,}(?::\d+)?'
+        r'|localhost(?::\d+)?'
+        r'|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?'
+        r')', re.IGNORECASE)
     return re.match(regex, url) is not None

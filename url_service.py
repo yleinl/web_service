@@ -1,6 +1,9 @@
 from utils import generate_short_id
+import threading
 
 url_store = {}
+
+lock = threading.Lock()
 
 
 def create_short_url(url: str, user_ip: str):
@@ -18,13 +21,14 @@ def create_short_url(url: str, user_ip: str):
             return url_info
     attempt = 0
     length = 8
-    while True:
-        url_id = generate_short_id(url, length, attempt)
-        if url_id not in url_store:
-            url_store[url_id] = {'id': url_id, 'long_url': url, 'user_ip': user_ip}
-            return url_store[url_id]
-        # concatenate a different number to handle collision
-        attempt += 1
+    with lock:
+        while True:
+            url_id = generate_short_id(url, length, attempt)
+            if url_id not in url_store:
+                url_store[url_id] = {'id': url_id, 'long_url': url, 'user_ip': user_ip}
+                return url_store[url_id]
+            # concatenate a different number to handle collision
+            attempt += 1
 
 
 def get_short_url_by_id(urlid: str):
@@ -48,7 +52,8 @@ def update_long_url_by_id(url_id: str, new_url: str, user_ip: str):
     if url_id in url_store:
         if url_store[url_id]['user_ip'] != user_ip:
             return None
-        url_store[url_id]['long_url'] = new_url
+        with lock:
+            url_store[url_id]['long_url'] = new_url
         return url_store[url_id]
     else:
         return None
@@ -64,7 +69,8 @@ def delete_short_url(url_id: str, user_ip: str):
     if url_id in url_store:
         if url_store[url_id]['user_ip'] != user_ip:
             return None
-        del url_store[url_id]
+        with lock:
+            del url_store[url_id]
         return True
     else:
         return False
@@ -77,4 +83,5 @@ def get_all_short_urls():
 
 def delete_all_short_urls():
     # Deletes all short URL entries from the database.
-    url_store.clear()
+    with lock:
+        url_store.clear()
