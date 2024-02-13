@@ -57,8 +57,8 @@ def is_valid_url(url):
     :return: validation result True or False
     """
     regex = re.compile(
-        r'(|https?://[a-zA-Z0-9]+\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?::\d+)?'
-        r'|\b[a-zA-Z0-9]+\.[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?::\d+)?'
+        r'(https?://[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(?::\d+)?'
+        r'|\b[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}(?::\d+)?'
         r'|localhost(?::\d+)?'
         r'|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?)', re.IGNORECASE)
     return re.match(regex, url) is not None
