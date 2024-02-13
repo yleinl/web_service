@@ -21,6 +21,12 @@ def base62_encode(num):
 
 
 def hash_encoder(url):
+    """
+    Hash the url to uniform it
+
+    :param url: The url to be hashed.
+    :return: The hash value of the url String
+    """
     url = str(url)
     hash_value = 0
     for char in url:

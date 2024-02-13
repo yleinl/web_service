@@ -109,8 +109,11 @@ def create_url_shorten():
         if not isinstance(length, int) or length <= 0:
             return jsonify({'error': 'length invalid'}), 400
         length = int(length)
-        res = create_short_url(url, user_ip, length)
-        return jsonify({'id': res['id']}), 201
+        try:
+            res = create_short_url(url, user_ip, length)
+            return jsonify({'id': res['id']}), 201
+        except Exception as e:
+            return jsonify({'error': str(e)}), 400
     else:
         return jsonify({'error': 'parameter incorrect'}), 400
 
