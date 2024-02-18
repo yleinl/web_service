@@ -7,6 +7,7 @@ This document provides an overview and setup guide for a REST API project design
 - `app.py`: The entry point of the Flask application. It defines the Flask app and the routes for handling requests.
 - `url_service.py`: Includes the CRUD operations.
 - `utils.py`: Provides utility functions, such as those for generating a short URL identifier, check URL format and so on.
+- `auth.py`: Provides interaction with database with user table, for authentication service.
 
 ## Setup and Installation
 
