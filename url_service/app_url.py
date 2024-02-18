@@ -3,10 +3,8 @@ import json
 from flask import Flask, request, jsonify
 from url_service import create_short_url, get_short_url_by_id, update_long_url_by_id, delete_short_url, \
     get_all_short_urls, delete_all_short_urls
-from utils import is_valid_url
-from auth import regeister_user, user_login, JWT_generate, password_change, JWT_table
+from utils import is_valid_url, JWT_Table
 app = Flask(__name__)
-
 
 # rest api and application starter, all database error return 400
 @app.route('/<url_id>', methods=['GET'])
@@ -128,7 +126,7 @@ def create_url_shorten():
             if res:
                 return jsonify({'id': res['id']}), 201
             else:
-                return jsonify({'error': 'autorization failed'}), 403
+                return jsonify({'error': 'authorization failed'}), 403
         except Exception as e:
             return jsonify({'error': str(e)}), 400
     else:
@@ -147,106 +145,21 @@ def delete_all():
     delete_all_short_urls(authorization_header)
     return '', 404
 
-# add authentication part
+
+trust_source = ['127.0.0.1']
 
 
-#user creation
-@app.route('/users', methods=['POST'])
-def create_user():
-    """
-    Create a new user with username and password and store it in a table
-    Return a 201 status code with the new user ID on success, or 409 with duplicate username, or 400 with invalid parameter(format or params).
-    """
-    if request.is_json:
-        data = request.json
-        username = data.get('username')
-        password = data.get('password')
-        if not username or not password:
-            return jsonify({'error': 'parameter invalid'}), 400
-        # check if the username exists
-        # if not, create a new user
-        # if exists, return 409
-        status_code = regeister_user(username, password)
-        if status_code == 201:
-            return jsonify({'id': username}), 201
-        elif status_code == 400:
-            return jsonify({'error': 'database error'}), 400
-        else:
-            return jsonify({'error': 'username exists'}), 409
-    else:
-        return jsonify({'error': 'parameter incorrect'}), 400
+@app.route("/authorization", methods=["POST"])
+def handle_notification():
+    if request.remote_addr not in trust_source:
+        return "Not Found", 404
+    data = request.get_json()
+    jwt_token = data.get("jwt")
+    username = data.get("username")
+    JWT_Table[jwt_token] = username
+    return "authorization received", 200
 
-
-#user login
-@app.route('/users/login', methods=['POST'])
-def login_user():
-    """
-    Login a user with username and password
-    If the username and password match, return a 200 status code with JWT token, or 403 with incorrect username or password, or 400 with invalid parameter(format or params).
-    """
-    if request.is_json:
-        data = request.json
-        username = data.get('username')
-        password = data.get('password')
-        if not username or not password:
-            return jsonify({'error': 'parameter invalid'}), 400
-        # check if the username exists
-        # if not, return 403
-        # if exists, check if the password match
-        # if not, return 403
-        # if match, return 200 with JWT token
-        status_code = user_login(username, password)
-        if status_code == 200:
-            # get the request header and payload
-            header = request.headers.to_wsgi_list()
-            payload = request.json
-            JWT_token = JWT_generate(header, payload)
-            JWT_table[JWT_token] = username
-            return jsonify({'token': JWT_token}), 200
-        elif status_code == 400:
-            return jsonify({'error': 'database error'}), 400
-        else:
-            return jsonify({'error': 'username or password incorrect'}), 403
-    else:
-        return jsonify({'error': 'parameter incorrect'}), 400
-
-
-#user change password
-@app.route('/users', methods=['PUT'])
-def change_password():
-    """
-    Change the password for a user with username and password
-    If the username and password match, return a 200 status code with the new user ID on success, or 403 with incorrect username or password, or 400 with invalid parameter(format or params).
-    """
-    if request.is_json:
-        data = request.json
-        username = data.get('username')
-        old_password = data.get('old-password')
-        new_password = data.get('new-password')
-        if not username or not old_password or not new_password:
-            return jsonify({'error': 'parameter invalid'}), 400
-        # check if the username exists
-        # if not, return 403
-        # if exists, check if the password match
-        # if not, return 403
-        # if match, change the password
-        status_code = user_login(username, old_password)
-        if status_code == 200:
-            status_code_inner = password_change(username, new_password)
-            if status_code_inner == 200:
-                return jsonify({'id': username}), 200
-            elif status_code_inner == 400:
-                return jsonify({'error': 'database error'}), 400
-            else:
-                # cannot reach here in normal situation, just in case
-                return jsonify({'error': 'username or password incorrect'}), 403
-        elif status_code == 400:
-            return jsonify({'error': 'database error'}), 400
-        else:
-            return jsonify({'error': 'username or password incorrect'}), 403
-    else:
-        return jsonify({'error': 'parameter incorrect'}), 400
 
 if __name__ == '__main__':
-    app.run()
+    app.run(port=5000)
     # app.run(host='0.0.0.0', port=5000)

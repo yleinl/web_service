@@ -1,6 +1,9 @@
 import string
 import re
+import requests
 BASE62 = string.digits + string.ascii_letters
+
+JWT_Table = {}
 
 
 def base62_encode(num):

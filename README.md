@@ -20,7 +20,7 @@ This document provides an overview and setup guide for a REST API project design
 2. **Run the Application**: Launch the Flask application by running `app.py`:
 
     ```bash
-    python app.py
+    python app_url.py
     ```
 
     This will start a development server, by default, it launch at port 5000 and can be accessible at `http://127.0.0.1:5000/`.

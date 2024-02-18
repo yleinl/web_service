@@ -1,16 +1,12 @@
 import sqlite3
-import json
-import base64
-import hashlib
-import hmac
 
 JWT_table = {}
-
 
 sql_create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                     username text PRIMARY KEY,
                                     password text NOT NULL
                                 ); """
+
 
 def create_connection(db_file):
     """ create a database connection to the SQLite database
@@ -44,7 +40,9 @@ def insert_user(conn, user):
 use username and password to register a user, if the username exists, return 409, else create a new user and return 201
 store user information in a database
 """
-def regeister_user(username, password):
+
+
+def register_user(username, password):
     conn = create_connection('user_auth.db')
     if conn is not None:
         cursor = conn.cursor()
@@ -59,7 +57,7 @@ def regeister_user(username, password):
             cursor.close()
             conn.close()
             return 409
-        
+
         # if not, create a new user
         user = (username, password)
         insert_user(conn, user)
@@ -70,8 +68,9 @@ def regeister_user(username, password):
     else:
         print("Error! cannot create the database connection.")
         return 400
-    
-#user login
+
+
+# user login
 def user_login(username, password):
     conn = create_connection('user_auth.db')
     if conn is not None:
@@ -105,26 +104,6 @@ def user_login(username, password):
     else:
         print("Error! cannot create the database connection.")
         return 400
-    
-"""
-generate a JWT token with the header and payload
-"""
-def JWT_generate(header, payload):
-    """
-    generate a JWT token with the header and payload
-    header is a list
-    payload is a dictionary
-    """
-
-    encoded_header = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()
-    encoded_payload = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
-    secret_key = 'my_secret_key'
-    signature = hmac.new(secret_key.encode(), f"{encoded_header}.{encoded_payload}".encode(), hashlib.sha256).digest()
-    encoded_signature = base64.urlsafe_b64encode(signature).decode()
-
-    jwt_token = f"{encoded_header}.{encoded_payload}.{encoded_signature}"
-
-    return jwt_token
 
 
 def password_change(username, password):

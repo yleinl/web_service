@@ -1,9 +1,7 @@
-from utils import generate_short_id
-from auth import JWT_table
+from utils import generate_short_id, JWT_Table
 import threading
 
 url_store = {}
-
 lock = threading.Lock()
 
 MAX_ATTEMPTS = 1000
@@ -19,9 +17,9 @@ def create_short_url(url: str, authorization_header: str, id_length: int):
     :param url: The given URL to be shortened.
     :return: The existing or newly created short URL object.
     """
-    if authorization_header not in JWT_table:
+    if authorization_header not in JWT_Table:
         return None
-    username = JWT_table[authorization_header]
+    username = JWT_Table[authorization_header]
     # global url_store
     for short_id, url_info in url_store.items():
         if url_info['long_url'] == url:
@@ -56,9 +54,9 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
     :param new_url: The new long URL to associate with the short URL.
     :return: The updated short URL object if successful, else None.
     """
-    if authorization_header not in JWT_table:
+    if authorization_header not in JWT_Table:
         return None
-    username = JWT_table[authorization_header]
+    username = JWT_Table[authorization_header]
     if url_id in url_store:
         if url_store[url_id]['username'] != username:
             return None
@@ -76,9 +74,9 @@ def delete_short_url(url_id: str, authorization_header: str):
     :param url_id: The URL ID of the short URL to delete.
     :return: True if deletion was successful, else False (URL ID not found).
     """
-    if authorization_header not in JWT_table:
+    if authorization_header not in JWT_Table:
         return 403
-    username = JWT_table[authorization_header]
+    username = JWT_Table[authorization_header]
     if url_id in url_store:
         if url_store[url_id]['username'] != username:
             return 403
@@ -91,7 +89,7 @@ def delete_short_url(url_id: str, authorization_header: str):
 
 def get_all_short_urls(authorization_header: str):
     # Retrieves all short URL entries from the database.
-    if authorization_header not in JWT_table:
+    if authorization_header not in JWT_Table:
         return None
     
     return list(url_store.values())
@@ -99,7 +97,7 @@ def get_all_short_urls(authorization_header: str):
 
 def delete_all_short_urls(authorization_header: str):
     # Deletes all short URL entries from the database.
-    if authorization_header not in JWT_table:
+    if authorization_header not in JWT_Table:
         return None
 
     with lock:
