@@ -1,4 +1,4 @@
-from utils import generate_short_id, JWT_Table
+from utils import generate_short_id, JWT_Table, is_jwt_expired
 import threading
 
 url_store = {}
@@ -17,7 +17,7 @@ def create_short_url(url: str, authorization_header: str, id_length: int):
     :param url: The given URL to be shortened.
     :return: The existing or newly created short URL object.
     """
-    if authorization_header not in JWT_Table:
+    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
         return None
     username = JWT_Table[authorization_header]
     # global url_store
@@ -74,7 +74,7 @@ def delete_short_url(url_id: str, authorization_header: str):
     :param url_id: The URL ID of the short URL to delete.
     :return: True if deletion was successful, else False (URL ID not found).
     """
-    if authorization_header not in JWT_Table:
+    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
         return 403
     username = JWT_Table[authorization_header]
     if url_id in url_store:

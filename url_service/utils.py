@@ -1,5 +1,9 @@
+import base64
+import json
 import string
 import re
+import time
+
 import requests
 BASE62 = string.digits + string.ascii_letters
 
@@ -65,3 +69,19 @@ def is_valid_url(url):
         r'|localhost(?::\d+)?'
         r'|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(?::\d+)?)', re.IGNORECASE)
     return re.match(regex, url) is not None
+
+
+def parse_jwt(token):
+    header, payload, signature = token.split('.')
+    decoded_payload = base64.urlsafe_b64decode(payload + '==').decode('utf-8')
+    return json.loads(decoded_payload)
+
+
+def is_jwt_expired(token):
+    payload = parse_jwt(token)
+    exp = payload.get('exp')
+
+    if exp is not None:
+        if int(exp) < time.time():
+            return True
+    return False

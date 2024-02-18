@@ -1,3 +1,5 @@
+import time
+
 import requests
 import json
 import base64
@@ -26,7 +28,7 @@ def JWT_generate(header, payload):
     header is a list
     payload is a dictionary
     """
-
+    payload['exp'] = int(time.time()) + 3600
     encoded_header = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()
     encoded_payload = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
     secret_key = 'wscs_is_very_nice'
