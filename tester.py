@@ -6,6 +6,7 @@ import json
 class TestApi(unittest.TestCase):
     # with fastapi default port is 8000 with flask is 5000
     base_url = "http://127.0.0.1:5000"
+    headers = {'Authorization': 'W1siQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iXSwgWyJVc2VyLUFnZW50IiwgIlBvc3RtYW5SdW50aW1lLzcuMzYuMyJdLCBbIkFjY2VwdCIsICIqLyoiXSwgWyJQb3N0bWFuLVRva2VuIiwgIjgzNGVlMWJlLWYxYWMtNDg5OC04Y2ExLTY3Njc0OTNhYjUzZiJdLCBbIkhvc3QiLCAibG9jYWxob3N0OjUwMDAiXSwgWyJBY2NlcHQtRW5jb2RpbmciLCAiZ3ppcCwgZGVmbGF0ZSwgYnIiXSwgWyJDb25uZWN0aW9uIiwgImtlZXAtYWxpdmUiXSwgWyJDb250ZW50LUxlbmd0aCIsICI1OCJdXQ==.eyJ1c2VybmFtZSI6ICJZaVRhb0xlaSIsICJwYXNzd29yZCI6ICIxMjMifQ==.Ijs6xIvEUU0-H6GvFHFJ7JRQhdjsGYPUImsGjInBMGc='}
 
     def setUp(self):
         # populate data before each test by doing two POST
@@ -19,7 +20,7 @@ class TestApi(unittest.TestCase):
             endpoint = "/"
             print(url_to_shorten)
             url = f"{self.base_url}{endpoint}"
-            response = requests.post(url, json={'value': str(url_to_shorten)})
+            response = requests.post(url, headers=self.headers,json={'value': str(url_to_shorten)})
             self.assertEqual(response.status_code, 201, f"Expected status code 201, but got {response.status_code}")
             self.assertIsNotNone(response.text, "Response text should not be None.")
             response_extracted = response.json()
@@ -35,7 +36,7 @@ class TestApi(unittest.TestCase):
         # erase everything
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
-        response = requests.delete(url)
+        response = requests.delete(url, headers=self.headers)
         # self.assertEqual(response.status_code, 404, f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
 
     """
@@ -50,7 +51,7 @@ class TestApi(unittest.TestCase):
 
         endpoint = "/"
         url = f"{self.base_url}{endpoint}{id}"
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
 
         self.assertEqual(response.status_code, 301, f"Expected status code 301, but got {response.status_code}")
 
@@ -63,7 +64,7 @@ class TestApi(unittest.TestCase):
 
         endpoint = "/"
         url = f"{self.base_url}{endpoint}{id}"
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
 
         self.assertEqual(response.status_code, 404, f"Expected status code 404, but got {response.status_code}")
 
@@ -84,24 +85,24 @@ class TestApi(unittest.TestCase):
 
         endpoint = "/"
         url = f"{self.base_url}{endpoint}{id}"
-        response = requests.put(url, data=json.dumps({'url': url_after_update}))
+        response = requests.put(url, headers=self.headers, data=json.dumps({'url': url_after_update}))
         self.assertEqual(response.status_code, 200, f"Expected status code 200, but got {response.status_code}")
 
         # check value has been rally changed by doing a get
         url = f"{self.base_url}{endpoint}{id}"
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
         self.assertEqual(response.json().get("value"), url_after_update,
                          "Expected response body to be " + url_after_update + " , but got " + response.json().get(
                              "value"))
 
         # check 400 by passing invalid url
         url = f"{self.base_url}{endpoint}{id}"
-        response = requests.put(url, data=json.dumps({'url': invalid_url}))
+        response = requests.put(url, headers=self.headers, data=json.dumps({'url': invalid_url}))
         self.assertEqual(response.status_code, 400, f"Expected status code 400, but got {response.status_code}")
 
         # check 404 aka if id exists
         url = f"{self.base_url}{endpoint}{not_existing_id}"
-        response = requests.put(url, data=json.dumps({'url': not_existing_id}))
+        response = requests.put(url, headers=self.headers, data=json.dumps({'url': not_existing_id}))
         self.assertEqual(response.status_code, 404, f"Expected status code 404, but got {response.status_code}")
 
     """
@@ -115,9 +116,9 @@ class TestApi(unittest.TestCase):
         id = self.id_shortened_url_1
         # url = f"{self.base_url}{endpoint}?value={id}"
         url = f"{self.base_url}{endpoint}{id}"
-        response = requests.delete(url)
+        response = requests.delete(url, headers=self.headers)
         self.assertEqual(response.status_code, 204, f"Expected status code 204, but got {response.status_code}")
-        response = requests.delete(url)
+        response = requests.delete(url, headers=self.headers)
         self.assertEqual(response.status_code, 404, f"Expected status code 404, but got {response.status_code}")
 
     """
@@ -130,7 +131,7 @@ class TestApi(unittest.TestCase):
     def test_get_all(self):
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
         self.assertEqual(response.status_code, 200, f"Expected status code 200, but got {response.status_code}")
         self.assertIsNotNone(response.text, "Response text should not be None.")
 
@@ -149,7 +150,7 @@ class TestApi(unittest.TestCase):
         # response = requests.post(url)
 
         url = f"{self.base_url}{endpoint}"
-        response = requests.post(url, json={'value': str(url_to_shorten)})
+        response = requests.post(url, headers=self.headers, json={'value': str(url_to_shorten)})
 
         self.assertEqual(response.status_code, 201, f"Expected status code 201, but got {response.status_code}")
         self.assertIsNotNone(response.json().get("id"), "Response text should not be None.")
@@ -157,7 +158,7 @@ class TestApi(unittest.TestCase):
         # check if id returned is correct
         temp = response.json().get("id")
         url = f"{self.base_url}{endpoint}{temp}"
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
         self.assertEqual(response.status_code, 301, f"Expected status code 301, but got {response.status_code}")
         self.assertEqual(response.json().get("value"), url_to_shorten,
                          "Expected response body to be " + url_to_shorten + " , but got " + response.json().get(
@@ -167,7 +168,7 @@ class TestApi(unittest.TestCase):
         url_to_shorten = ""
         endpoint = "/"
         url = f"{self.base_url}{endpoint}{url_to_shorten}"
-        response = requests.post(url, json={'value': str(url_to_shorten)})
+        response = requests.post(url, headers=self.headers, json={'value': str(url_to_shorten)})
         self.assertEqual(response.status_code, 400, f"Expected status code 400, but got {response.status_code}")
 
     """
@@ -179,14 +180,14 @@ class TestApi(unittest.TestCase):
         # delete all
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
-        response = requests.delete(url)
+        response = requests.delete(url, headers=self.headers)
         self.assertEqual(response.status_code, 404,
                          f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
 
         # make a getall to check that stuff is erased
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
-        response = requests.get(url)
+        response = requests.get(url, headers=self.headers)
         self.assertIsNone(response.json().get("value"), "The value should be None since should be empty.")
 
 

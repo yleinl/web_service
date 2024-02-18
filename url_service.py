@@ -1,4 +1,5 @@
 from utils import generate_short_id
+from auth import JWT_table
 import threading
 
 url_store = {}
@@ -8,7 +9,7 @@ lock = threading.Lock()
 MAX_ATTEMPTS = 1000
 
 
-def create_short_url(url: str, user_ip: str, id_length: int):
+def create_short_url(url: str, authorization_header: str, id_length: int):
     """
     Checks if a short URL ID for the given long URL already exists. If not,
     generates a new short ID and creates a new short URL entry in the memory.
@@ -18,6 +19,9 @@ def create_short_url(url: str, user_ip: str, id_length: int):
     :param url: The given URL to be shortened.
     :return: The existing or newly created short URL object.
     """
+    if authorization_header not in JWT_table:
+        return None
+    username = JWT_table[authorization_header]
     # global url_store
     for short_id, url_info in url_store.items():
         if url_info['long_url'] == url:
@@ -28,7 +32,7 @@ def create_short_url(url: str, user_ip: str, id_length: int):
         for attempt in range(MAX_ATTEMPTS):
             url_id = generate_short_id(url, length, attempt)
             if url_id not in url_store:
-                url_store[url_id] = {'id': url_id, 'long_url': url, 'user_ip': user_ip}
+                url_store[url_id] = {'id': url_id, 'long_url': url, 'username': username}
                 return url_store[url_id]
     raise Exception("Failed to generate a unique short ID after maximum attempts.")
 
@@ -43,17 +47,20 @@ def get_short_url_by_id(urlid: str):
     return url_store.get(urlid, None)
 
 
-def update_long_url_by_id(url_id: str, new_url: str, user_ip: str):
+def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
     """
     Updates the long URL of an existing id in the database.
 
-    :param user_ip: The user IP address for authorization
+    :param username: The username for authorization
     :param url_id: The URL ID to update.
     :param new_url: The new long URL to associate with the short URL.
     :return: The updated short URL object if successful, else None.
     """
+    if authorization_header not in JWT_table:
+        return None
+    username = JWT_table[authorization_header]
     if url_id in url_store:
-        if url_store[url_id]['user_ip'] != user_ip:
+        if url_store[url_id]['username'] != username:
             return None
         with lock:
             url_store[url_id]['long_url'] = new_url
@@ -62,29 +69,38 @@ def update_long_url_by_id(url_id: str, new_url: str, user_ip: str):
         return None
 
 
-def delete_short_url(url_id: str, user_ip: str):
+def delete_short_url(url_id: str, authorization_header: str):
     """
     Deletes a short URL entry from the database by its URL ID.
-    :param user_ip: The user IP address for authorization
+    :param username: The username for authorization
     :param url_id: The URL ID of the short URL to delete.
     :return: True if deletion was successful, else False (URL ID not found).
     """
+    if authorization_header not in JWT_table:
+        return 403
+    username = JWT_table[authorization_header]
     if url_id in url_store:
-        if url_store[url_id]['user_ip'] != user_ip:
-            return None
+        if url_store[url_id]['username'] != username:
+            return 403
         with lock:
             del url_store[url_id]
-        return True
+        return 204
     else:
-        return False
+        return 404
 
 
-def get_all_short_urls():
+def get_all_short_urls(authorization_header: str):
     # Retrieves all short URL entries from the database.
+    if authorization_header not in JWT_table:
+        return None
+    
     return list(url_store.values())
 
 
-def delete_all_short_urls():
+def delete_all_short_urls(authorization_header: str):
     # Deletes all short URL entries from the database.
+    if authorization_header not in JWT_table:
+        return None
+
     with lock:
         url_store.clear()

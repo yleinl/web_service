@@ -4,6 +4,9 @@ import base64
 import hashlib
 import hmac
 
+JWT_table = {}
+
+
 sql_create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                     username text PRIMARY KEY,
                                     password text NOT NULL
