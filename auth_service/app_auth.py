@@ -22,7 +22,7 @@ def create_user():
         username = data.get('username')
         password = data.get('password')
         if not username or not password:
-            return jsonify({'error': 'parameter invalid'}), 400
+            return jsonify({'value': 'parameter invalid'}), 400
         # check if the username exists
         # if not, create a new user
         # if exists, return 409
@@ -30,11 +30,11 @@ def create_user():
         if status_code == 201:
             return jsonify({'id': username}), 201
         elif status_code == 400:
-            return jsonify({'error': 'database error'}), 400
+            return jsonify({'value': 'database error'}), 400
         else:
-            return jsonify({'error': 'username exists'}), 409
+            return jsonify({'value': 'duplicate'}), 409
     else:
-        return jsonify({'error': 'parameter incorrect'}), 400
+        return jsonify({'value': 'parameter incorrect'}), 400
 
 
 # user login
@@ -49,7 +49,7 @@ def login_user():
         username = data.get('username')
         password = data.get('password')
         if not username or not password:
-            return jsonify({'error': 'parameter invalid'}), 400
+            return jsonify({'value': 'parameter invalid'}), 400
         # check if the username exists
         # if not, return 403
         # if exists, check if the password match
@@ -63,13 +63,13 @@ def login_user():
             JWT_token = JWT_generate(header, payload)
             JWT_table[JWT_token] = username
             notify_url_service(JWT_token, username)
-            return jsonify({'token': JWT_token}), 200
+            return jsonify({'value': JWT_token}), 200
         elif status_code == 400:
-            return jsonify({'error': 'database error'}), 400
+            return jsonify({'value': 'database error'}), 400
         else:
-            return jsonify({'error': 'username or password incorrect'}), 403
+            return jsonify({'value': 'forbidden'}), 403
     else:
-        return jsonify({'error': 'parameter incorrect'}), 400
+        return jsonify({'value': 'parameter incorrect'}), 400
 
 
 # user change password
@@ -85,7 +85,7 @@ def change_password():
         old_password = data.get('old-password')
         new_password = data.get('new-password')
         if not username or not old_password or not new_password:
-            return jsonify({'error': 'parameter invalid'}), 400
+            return jsonify({'value': 'parameter invalid'}), 400
         # check if the username exists
         # if not, return 403
         # if exists, check if the password match
@@ -97,16 +97,16 @@ def change_password():
             if status_code_inner == 200:
                 return jsonify({'id': username}), 200
             elif status_code_inner == 400:
-                return jsonify({'error': 'database error'}), 400
+                return jsonify({'value': 'database error'}), 400
             else:
                 # cannot reach here in normal situation, just in case
-                return jsonify({'error': 'username or password incorrect'}), 403
+                return jsonify({'value': 'forbidden'}), 403
         elif status_code == 400:
-            return jsonify({'error': 'database error'}), 400
+            return jsonify({'value': 'database error'}), 400
         else:
-            return jsonify({'error': 'username or password incorrect'}), 403
+            return jsonify({'value': 'forbidden'}), 403
     else:
-        return jsonify({'error': 'parameter incorrect'}), 400
+        return jsonify({'value': 'parameter incorrect'}), 400
 
 
 if __name__ == '__main__':

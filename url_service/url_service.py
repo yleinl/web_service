@@ -90,7 +90,7 @@ def delete_short_url(url_id: str, authorization_header: str):
 def get_all_short_urls(authorization_header: str):
     # Retrieves all short URL entries from the database.
     if authorization_header not in JWT_Table:
-        return None
+        return -1
     
     return list(url_store.values())
 
@@ -98,7 +98,8 @@ def get_all_short_urls(authorization_header: str):
 def delete_all_short_urls(authorization_header: str):
     # Deletes all short URL entries from the database.
     if authorization_header not in JWT_Table:
-        return None
+        return 403
 
     with lock:
         url_store.clear()
+    return 404

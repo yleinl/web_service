@@ -28,18 +28,18 @@ def update_long_url(url_id):
     """
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
-        return jsonify({'error': 'authorization required'}), 403
+        return jsonify({'value': 'forbidden'}), 403
     if request.is_json:
         data = request.json
         new_url = data.get('url')
         # user_ip = request.remote_addr
         if not new_url:
-            return jsonify({'error': 'parameter invalid'}), 400
+            return jsonify({'error': 'parameter invalid', 'value': 'error'}), 400
         # check first to pass the test
         if not get_short_url_by_id(url_id):
             return jsonify({'error': 'url id not found'}), 404
         if not is_valid_url(new_url):
-            return jsonify({'error': 'url invalid'}), 400
+            return jsonify({'error': 'url invalid', 'value': 'error'}), 400
         res = update_long_url_by_id(url_id, new_url, authorization_header)
         if res:
             return jsonify({'url': new_url}), 200
@@ -50,13 +50,13 @@ def update_long_url(url_id):
         data = json.loads(request.data.decode('utf-8'))
         new_url = data.get('url')
         if not new_url:
-            return jsonify({'error': 'parameter invalid'}), 400
+            return jsonify({'error': 'parameter invalid', 'value': 'error'}), 400
 
         # user_ip = request.remote_addr
         if not get_short_url_by_id(url_id):
             return jsonify({'error': 'url id not found'}), 404
         if not is_valid_url(new_url):
-            return jsonify({'error': 'url invalid'}), 400
+            return jsonify({'error': 'url invalid', 'value': 'error'}), 400
         res = update_long_url_by_id(url_id, new_url, authorization_header)
         if res:
             return jsonify({'url': new_url}), 200
@@ -73,7 +73,7 @@ def delete_long_url(url_id):
     # user_ip = request.remote_addr
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
-        return jsonify({'error': 'authorization required'}), 403
+        return jsonify({'value': 'forbidden'}), 403
     res = delete_short_url(url_id, authorization_header)
     if res == 204:
         return jsonify({'message': 'delete success'}), 204
@@ -91,13 +91,15 @@ def get_all():
     """
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
-        return jsonify({'error': 'authorization required'}), 403
+        return jsonify({'value': 'forbidden'}), 403
     short_urls = get_all_short_urls(authorization_header)
-    if short_urls:
+    if short_urls == -1:
+        return jsonify({'value': 'forbidden'}), 403
+    elif not short_urls:
+        return jsonify({'value': None}), 403
+    else:
         value = "\n".join([f"ID: {url['id']}, Long URL: {url['long_url']}, Created by: {url['username']} \n" for url in short_urls])
         return jsonify({'value': value}), 200
-    else:
-        return jsonify({'message': 'autorization failed'}), 403
 
 
 @app.route('/', methods=['POST'])
@@ -108,29 +110,29 @@ def create_url_shorten():
     """
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
-        return jsonify({'error': 'authorization required'}), 403
+        return jsonify({'value': 'forbidden'}), 403
     if request.is_json:
         # user_ip = request.remote_addr
         data = request.json
         url = data.get('value')
         if not url:
-            return jsonify({'error': 'parameter invalid'}), 400
+            return jsonify({'error': 'parameter invalid', 'value': 'error'}), 400
         if not is_valid_url(url):
-            return jsonify({'error': 'url invalid'}), 400
+            return jsonify({'error': 'url invalid', 'value': 'error'}), 400
         length = data.get('length', 5)  # Use 5 as default if 'length' is not provided
         if not isinstance(length, int) or length <= 0:
-            return jsonify({'error': 'length invalid'}), 400
+            return jsonify({'error': 'length invalid', 'value': 'error'}), 400
         length = int(length)
         try:
             res = create_short_url(url, authorization_header, length)
             if res:
                 return jsonify({'id': res['id']}), 201
             else:
-                return jsonify({'error': 'authorization failed'}), 403
+                return jsonify({'value': 'forbidden'}), 403
         except Exception as e:
-            return jsonify({'error': str(e)}), 400
+            return jsonify({'error': str(e), 'value': 'error'}), 400
     else:
-        return jsonify({'error': 'parameter incorrect'}), 400
+        return jsonify({'error': 'parameter incorrect', 'value': 'error'}), 400
 
 
 @app.route('/', methods=['DELETE'])
@@ -141,9 +143,12 @@ def delete_all():
     """
     authorization_header = request.headers.get('Authorization')
     if not authorization_header:
-        return jsonify({'error': 'authorization required'}), 403
-    delete_all_short_urls(authorization_header)
-    return '', 404
+        return jsonify({'value': 'forbidden'}), 403
+    res = delete_all_short_urls(authorization_header)
+    if res == 404:
+        return '', 404
+    else:
+        return jsonify({'value': 'forbidden'}), 403
 
 
 trust_source = ['127.0.0.1']
