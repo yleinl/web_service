@@ -24,7 +24,6 @@ def create_short_url(url: str, authorization_header: str, id_length: int):
     for short_id, url_info in url_store.items():
         if url_info['long_url'] == url:
             return url_info
-    attempt = 0
     length = id_length
     with lock:
         for attempt in range(MAX_ATTEMPTS):
@@ -49,7 +48,6 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
     """
     Updates the long URL of an existing id in the database.
 
-    :param username: The username for authorization
     :param url_id: The URL ID to update.
     :param new_url: The new long URL to associate with the short URL.
     :return: The updated short URL object if successful, else None.

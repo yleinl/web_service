@@ -6,6 +6,7 @@ from url_service import create_short_url, get_short_url_by_id, update_long_url_b
 from utils import is_valid_url, JWT_Table
 app = Flask(__name__)
 
+
 # rest api and application starter, all database error return 400
 @app.route('/<url_id>', methods=['GET'])
 def get_long_url(url_id):

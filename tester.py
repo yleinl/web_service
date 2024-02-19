@@ -6,7 +6,15 @@ import json
 class TestApi(unittest.TestCase):
     # with fastapi default port is 8000 with flask is 5000
     base_url = "http://127.0.0.1:5000"
-    headers = {'Authorization': "W1siQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iXSwgWyJBdXRob3JpemF0aW9uIiwgIkJlYXJlciBleUpoYkdjaU9pSklVekkxTmlKOS5lMzAuNWdQNDZ3bjk5bW9qMEhiTzF6VThTVXNzUGR6NXFIZTJYRW5Xa1VDVTA2VSJdLCBbIlVzZXItQWdlbnQiLCAiUG9zdG1hblJ1bnRpbWUvNy4zNi4zIl0sIFsiQWNjZXB0IiwgIiovKiJdLCBbIkNhY2hlLUNvbnRyb2wiLCAibm8tY2FjaGUiXSwgWyJQb3N0bWFuLVRva2VuIiwgIjg1ZmFmNmMxLTFkZmEtNDAxOS1iYzVlLTJmMjUxNDFkMmJlNSJdLCBbIkhvc3QiLCAiMTI3LjAuMC4xOjUwMDEiXSwgWyJBY2NlcHQtRW5jb2RpbmciLCAiZ3ppcCwgZGVmbGF0ZSwgYnIiXSwgWyJDb25uZWN0aW9uIiwgImtlZXAtYWxpdmUiXSwgWyJDb250ZW50LUxlbmd0aCIsICIzOCJdXQ==.eyJ1c2VybmFtZSI6ICJseXQiLCAicGFzc3dvcmQiOiAiMTIzIiwgImV4cCI6IDE3MDgzNTI0MzJ9.woYhnY85By5MSosABdR2YKroPl-azp3HKcJrv0iH-Qs="}
+    headers = {'Authorization': "W1siQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iXSwgWyJBdXRob3JpemF0aW9uIiwgIkJl"
+                                "YXJlciBleUpoYkdjaU9pSklVekkxTmlKOS5lMzAuNWdQNDZ3bjk5bW9qMEhiTzF6VThTVXNzUGR6NXFI"
+                                "ZTJYRW5Xa1VDVTA2VSJdLCBbIlVzZXItQWdlbnQiLCAiUG9zdG1hblJ1bnRpbWUvNy4zNi4zIl0sIFsi"
+                                "QWNjZXB0IiwgIiovKiJdLCBbIkNhY2hlLUNvbnRyb2wiLCAibm8tY2FjaGUiXSwgWyJQb3N0bWFuLVRv"
+                                "a2VuIiwgIjYyOTQxOTVhLTgyNWQtNDljNy1iZTg5LWJjMDhiOTFiY2MzZSJdLCBbIkhvc3QiLCAiMTI3"
+                                "LjAuMC4xOjUwMDEiXSwgWyJBY2NlcHQtRW5jb2RpbmciLCAiZ3ppcCwgZGVmbGF0ZSwgYnIiXSwgWyJD"
+                                "b25uZWN0aW9uIiwgImtlZXAtYWxpdmUiXSwgWyJDb250ZW50LUxlbmd0aCIsICIzOCJdXQ==.eyJ1c2V"
+                                "ybmFtZSI6ICJseXQiLCAicGFzc3dvcmQiOiAiMTIzIiwgImV4cCI6IDE3MDgzNTMxMDN9.Aorlc2IEVu"
+                                "jMvQEJOivbkgZ082HQQ7qMzQF7VBAY-n4="}
 
     def setUp(self):
         # populate data before each test by doing two POST
