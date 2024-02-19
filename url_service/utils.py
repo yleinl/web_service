@@ -5,6 +5,7 @@ import re
 import time
 
 import requests
+
 BASE62 = string.digits + string.ascii_letters
 
 JWT_Table = {}
@@ -37,7 +38,7 @@ def hash_encoder(url):
     url = str(url)
     hash_value = 0
     for char in url:
-        hash_value = (hash_value * 31 + ord(char)) % 2**64
+        hash_value = (hash_value * 31 + ord(char)) % 2 ** 64
     return hash_value
 
 

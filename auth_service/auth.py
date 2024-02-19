@@ -25,6 +25,8 @@ def create_connection(db_file):
 def insert_user(conn, user):
     """
     try to insert a new user
+    :param conn: database connection
+    :param user: user object
     """
 
     sql = ''' INSERT INTO users(username, password)
@@ -43,10 +45,19 @@ store user information in a database
 
 
 def register_user(username, password):
+    """
+    Register a new user with the given username and password.
+    If the username already exists, return 409 (Conflict).
+    If the registration is successful, return 201 (Created).
+    :param username: The username for the new user.
+    :param password: The password for the new user.
+    :return: An HTTP status code indicating the result of the registration attempt.
+             201 for successful registration, 409 if the username already exists,
+             400 for database errors or inability to create a database connection.
+    """
     conn = create_connection('user_auth.db')
     if conn is not None:
         cursor = conn.cursor()
-
         cursor.execute(sql_create_users_table)
 
         # check if the username exists
@@ -72,6 +83,14 @@ def register_user(username, password):
 
 # user login
 def user_login(username, password):
+    """
+    Attempt to authenticate a user based on the provided username and password.
+    :param username: The username to authenticate.
+    :param password: The password associated with the username.
+    :return: An HTTP status code indicating the result of the login attempt.
+             200 for successful login, 403 for incorrect password, or username not found,
+             400 for database errors or inability to create a database connection.
+    """
     conn = create_connection('user_auth.db')
     if conn is not None:
         cursor = conn.cursor()
@@ -107,6 +126,14 @@ def user_login(username, password):
 
 
 def password_change(username, password):
+    """
+    Attempt to change the password of the specified user.
+    :param username: The username whose password needs to be changed.
+    :param password: The new password for the user.
+    :return: An HTTP status code indicating the result of the password change attempt.
+             200 for successful password change, 403 if the username doesn't exist,
+             400 for database errors or inability to create a database connection.
+    """
     conn = create_connection('user_auth.db')
     if conn is not None:
         cursor = conn.cursor()

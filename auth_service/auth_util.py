@@ -8,6 +8,11 @@ import hmac
 
 
 def notify_url_service(jwt_token, username):
+    """
+    Notify the url shorten service with a JWT token and username for authentication.
+    :param jwt_token: The JWT token to send.
+    :param username: The username associated with the JWT token.
+    """
     business_service_url = "http://127.0.0.1:5000/authorization"
     payload = {'jwt': jwt_token, 'username': username}
     response = requests.post(business_service_url, json=payload)
@@ -24,9 +29,10 @@ generate a JWT token with the header and payload
 
 def JWT_generate(header, payload):
     """
-    generate a JWT token with the header and payload
-    header is a list
-    payload is a dictionary
+    Generate a JWT token with the provided header and payload.
+    :param header: A list containing the header information.
+    :param payload: A dictionary containing the payload information.
+    :return: The generated JWT token.
     """
     payload['exp'] = int(time.time()) + 3600
     encoded_header = base64.urlsafe_b64encode(json.dumps(header).encode()).decode()
