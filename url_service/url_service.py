@@ -52,7 +52,7 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
     :param new_url: The new long URL to associate with the short URL.
     :return: The updated short URL object if successful, else None.
     """
-    if authorization_header not in JWT_Table:
+    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
         return None
     username = JWT_Table[authorization_header]
     if url_id in url_store:
@@ -68,7 +68,6 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
 def delete_short_url(url_id: str, authorization_header: str):
     """
     Deletes a short URL entry from the database by its URL ID.
-    :param username: The username for authorization
     :param url_id: The URL ID of the short URL to delete.
     :return: True if deletion was successful, else False (URL ID not found).
     """
@@ -87,7 +86,7 @@ def delete_short_url(url_id: str, authorization_header: str):
 
 def get_all_short_urls(authorization_header: str):
     # Retrieves all short URL entries from the database.
-    if authorization_header not in JWT_Table:
+    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
         return -1
     
     return list(url_store.values())
@@ -95,7 +94,7 @@ def get_all_short_urls(authorization_header: str):
 
 def delete_all_short_urls(authorization_header: str):
     # Deletes all short URL entries from the database.
-    if authorization_header not in JWT_Table:
+    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
         return 403
 
     with lock:

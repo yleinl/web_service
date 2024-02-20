@@ -6,15 +6,17 @@ import json
 class TestApi(unittest.TestCase):
     # with fastapi default port is 8000 with flask is 5000
     base_url = "http://127.0.0.1:5000"
-    headers = {'Authorization': "W1siQ29udGVudC1UeXBlIiwgImFwcGxpY2F0aW9uL2pzb24iXSwgWyJBdXRob3JpemF0aW9uIiwgIkJl"
-                                "YXJlciBleUpoYkdjaU9pSklVekkxTmlKOS5lMzAuNWdQNDZ3bjk5bW9qMEhiTzF6VThTVXNzUGR6NXFI"
-                                "ZTJYRW5Xa1VDVTA2VSJdLCBbIlVzZXItQWdlbnQiLCAiUG9zdG1hblJ1bnRpbWUvNy4zNi4zIl0sIFsi"
-                                "QWNjZXB0IiwgIiovKiJdLCBbIkNhY2hlLUNvbnRyb2wiLCAibm8tY2FjaGUiXSwgWyJQb3N0bWFuLVRv"
-                                "a2VuIiwgIjYyOTQxOTVhLTgyNWQtNDljNy1iZTg5LWJjMDhiOTFiY2MzZSJdLCBbIkhvc3QiLCAiMTI3"
-                                "LjAuMC4xOjUwMDEiXSwgWyJBY2NlcHQtRW5jb2RpbmciLCAiZ3ppcCwgZGVmbGF0ZSwgYnIiXSwgWyJD"
-                                "b25uZWN0aW9uIiwgImtlZXAtYWxpdmUiXSwgWyJDb250ZW50LUxlbmd0aCIsICIzOCJdXQ==.eyJ1c2V"
-                                "ybmFtZSI6ICJseXQiLCAicGFzc3dvcmQiOiAiMTIzIiwgImV4cCI6IDE3MDgzNTMxMDN9.Aorlc2IEVu"
-                                "jMvQEJOivbkgZ082HQQ7qMzQF7VBAY-n4="}
+    auth_url = "http://127.0.0.1:5001"
+    end_point = "/"
+    create = "users"
+    login = "users/login"
+    url_create = f"{auth_url}{end_point}{create}"
+    url_login = f"{auth_url}{end_point}{login}"
+    requests.post(url_create, json={'username': 'test', 'password': 'test'})
+    response_login = requests.post(url_login, json={'username': 'test', 'password': 'test'})
+
+    headers = {'Authorization': json.loads(response_login.content)["detail"]}
+    headers_wrong = {'Authorization': 'wrong'}
 
     def setUp(self):
         # populate data before each test by doing two POST
@@ -93,6 +95,11 @@ class TestApi(unittest.TestCase):
 
         endpoint = "/"
         url = f"{self.base_url}{endpoint}{id}"
+        response = requests.put(url, headers=self.headers_wrong, data=json.dumps({'url': url_after_update}))
+        self.assertEqual(response.status_code, 403, f"Expected status code 403, but got {response.status_code}")
+
+
+        url = f"{self.base_url}{endpoint}{id}"
         response = requests.put(url, headers=self.headers, data=json.dumps({'url': url_after_update}))
         self.assertEqual(response.status_code, 200, f"Expected status code 200, but got {response.status_code}")
 
@@ -126,6 +133,8 @@ class TestApi(unittest.TestCase):
         url = f"{self.base_url}{endpoint}{id}"
         response = requests.delete(url, headers=self.headers)
         self.assertEqual(response.status_code, 204, f"Expected status code 204, but got {response.status_code}")
+        response = requests.delete(url, headers=self.headers_wrong)
+        self.assertEqual(response.status_code, 403, f"Expected status code 403, but got {response.status_code}")
         response = requests.delete(url, headers=self.headers)
         self.assertEqual(response.status_code, 404, f"Expected status code 404, but got {response.status_code}")
 
@@ -139,6 +148,9 @@ class TestApi(unittest.TestCase):
     def test_get_all(self):
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
+        response = requests.get(url, headers=self.headers_wrong)
+        self.assertEqual(response.status_code, 403, f"Expected status code 403, but got {response.status_code}")
+
         response = requests.get(url, headers=self.headers)
         self.assertEqual(response.status_code, 200, f"Expected status code 200, but got {response.status_code}")
         self.assertIsNotNone(response.text, "Response text should not be None.")
@@ -158,6 +170,10 @@ class TestApi(unittest.TestCase):
         # response = requests.post(url)
 
         url = f"{self.base_url}{endpoint}"
+        response = requests.post(url, headers=self.headers_wrong, json={'value': str(url_to_shorten)})
+
+        self.assertEqual(response.status_code, 403, f"Expected status code 403, but got {response.status_code}")
+
         response = requests.post(url, headers=self.headers, json={'value': str(url_to_shorten)})
 
         self.assertEqual(response.status_code, 201, f"Expected status code 201, but got {response.status_code}")
@@ -188,6 +204,10 @@ class TestApi(unittest.TestCase):
         # delete all
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
+        response = requests.delete(url, headers=self.headers_wrong)
+        self.assertEqual(response.status_code, 403,
+                         f"Expected status code 403 to confirm correct erase, but got {response.status_code}")
+
         response = requests.delete(url, headers=self.headers)
         self.assertEqual(response.status_code, 404,
                          f"Expected status code 404 to confirm correct erase, but got {response.status_code}")

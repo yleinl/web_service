@@ -45,7 +45,7 @@ def update_long_url(url_id):
         if res:
             return jsonify({'url': new_url}), 200
         else:
-            return jsonify({'error': 'url id update not permitted'}), 403
+            return jsonify({'value': 'forbidden'}), 403
     else:
         # as the request type in tester is not json, but a string
         data = json.loads(request.data.decode('utf-8'))
@@ -62,7 +62,7 @@ def update_long_url(url_id):
         if res:
             return jsonify({'url': new_url}), 200
         else:
-            return jsonify({'error': 'url id update not permitted'}), 403
+            return jsonify({'value': 'forbidden'}), 403
 
 
 @app.route('/<url_id>', methods=['DELETE'])
@@ -81,7 +81,7 @@ def delete_long_url(url_id):
     elif res == 404:
         return jsonify({'error': 'url id not found'}), 404
     else:
-        return jsonify({'error': 'url delete not permitted'}), 403
+        return jsonify({'value': 'forbidden'}), 403
 
 
 @app.route('/', methods=['GET'])
