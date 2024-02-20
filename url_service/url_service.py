@@ -13,8 +13,8 @@ def create_short_url(url: str, authorization_header: str, id_length: int):
     generates a new short ID and creates a new short URL entry in the memory.
 
     :param id_length: length of the URL
-    :param user_ip: The user IP address for authorization
     :param url: The given URL to be shortened.
+    :param authorization_header: Token
     :return: The existing or newly created short URL object.
     """
     if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
@@ -50,6 +50,7 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
 
     :param url_id: The URL ID to update.
     :param new_url: The new long URL to associate with the short URL.
+    :param authorization_header: Token
     :return: The updated short URL object if successful, else None.
     """
     if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
@@ -69,6 +70,7 @@ def delete_short_url(url_id: str, authorization_header: str):
     """
     Deletes a short URL entry from the database by its URL ID.
     :param url_id: The URL ID of the short URL to delete.
+    :param authorization_header: Token
     :return: True if deletion was successful, else False (URL ID not found).
     """
     if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):

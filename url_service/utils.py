@@ -4,7 +4,6 @@ import string
 import re
 import time
 
-import requests
 
 BASE62 = string.digits + string.ascii_letters
 

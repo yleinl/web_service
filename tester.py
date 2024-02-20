@@ -12,10 +12,10 @@ class TestApi(unittest.TestCase):
     login = "users/login"
     url_create = f"{auth_url}{end_point}{create}"
     url_login = f"{auth_url}{end_point}{login}"
-    requests.post(url_create, json={'username': 'test', 'password': 'test'})
+    response_create = requests.post(url_create, json={'username': 'test', 'password': 'test'})
     response_login = requests.post(url_login, json={'username': 'test', 'password': 'test'})
 
-    headers = {'Authorization': json.loads(response_login.content)["detail"]}
+    headers = {'Authorization': json.loads(response_login.content)["token"]}
     headers_wrong = {'Authorization': 'wrong'}
 
     def setUp(self):

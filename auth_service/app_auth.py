@@ -63,7 +63,7 @@ def login_user():
             JWT_token = JWT_generate(header, payload)
             JWT_table[JWT_token] = username
             notify_url_service(JWT_token, username)
-            return jsonify({'detail': JWT_token}), 200
+            return jsonify({'token': JWT_token}), 200
         elif status_code == 400:
             return jsonify({'detail': 'database error'}), 400
         else:
