@@ -94,7 +94,7 @@ def get_all():
     if not authorization_header:
         return jsonify({'value': 'forbidden'}), 403
     short_urls = get_all_short_urls(authorization_header)
-    if short_urls == -1:
+    if short_urls == 403:
         return jsonify({'value': 'forbidden'}), 403
     elif not short_urls:
         return jsonify({'value': None}), 403

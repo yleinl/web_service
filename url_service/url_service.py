@@ -89,7 +89,7 @@ def delete_short_url(url_id: str, authorization_header: str):
 def get_all_short_urls(authorization_header: str):
     # Retrieves all short URL entries from the database.
     if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
-        return -1
+        return 403   # 403 forbidden
     
     return list(url_store.values())
 
