@@ -1,7 +1,7 @@
 import json
 
 from flask import Flask, request, jsonify
-from url_service import create_short_url, get_short_url_by_id, update_long_url_by_id, delete_short_url, \
+from url_service_db import create_short_url, get_short_url_by_id, update_long_url_by_id, delete_short_url, \
     get_all_short_urls, delete_all_short_urls
 from utils import is_valid_url, JWT_Table
 app = Flask(__name__)
