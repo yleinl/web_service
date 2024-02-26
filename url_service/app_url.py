@@ -152,7 +152,7 @@ def delete_all():
         return jsonify({'value': 'forbidden'}), 403
 
 
-trust_source = ['127.0.0.1']
+trust_source = ['127.0.0.1', '145.100.135.223', '145.100.135.224', '145.100.135.147']
 
 
 @app.route("/authorization", methods=["POST"])
