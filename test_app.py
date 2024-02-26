@@ -1,40 +1,53 @@
 import unittest
 import requests
 import json
+import csv
+import random
 
 
 class TestApi(unittest.TestCase):
-    # with fastapi default port is 8000 with flask is 5000
+    # modify this to your local server settings
     base_url = "http://127.0.0.1:5000"
     auth_url = "http://127.0.0.1:5001"
     end_point = "/"
+    test_username = "test"
+    test_password = "test"
     create = "users"
     login = "users/login"
+
     url_create = f"{auth_url}{end_point}{create}"
     url_login = f"{auth_url}{end_point}{login}"
-    response_create = requests.post(url_create, json={'username': 'test', 'password': 'test'})
-    response_login = requests.post(url_login, json={'username': 'test', 'password': 'test'})
+    response_create = requests.post(url_create, json={'username': test_username, 'password': test_password})
+    response_login = requests.post(url_login, json={'username': test_username, 'password': test_password})
 
     headers = {'Authorization': json.loads(response_login.content)["token"]}
     headers_wrong = {'Authorization': 'wrong'}
 
+    def populate_variables_from_csv(self):
+        with open('read_from.csv', 'r') as f:
+            reader = csv.reader(f)
+            next(reader, None)
+            data = [row for row in reader if len(row) >= 5]
+            random_row = random.choice(data)
+            return random_row
+
     def setUp(self):
         # populate data before each test by doing two POST
-        # TODO make it read data from a csv or similar to avoid people hardcoding answers
-        self.url_to_shorten_1 = "https://en.wikipedia.org/wiki/Docker_(software)"
-        self.url_to_shorten_2 = "https://fastapi.tiangolo.com"
         self.id_shortened_url_1 = ""
         self.id_shortened_url_2 = ""
+
+        (self.url_to_shorten_1, self.url_to_shorten_2,
+         self.url_after_update, self.not_existing_id, self.invalid_url) = self.populate_variables_from_csv()
 
         def do_post(url_to_shorten):
             endpoint = "/"
             print(url_to_shorten)
             url = f"{self.base_url}{endpoint}"
-            response = requests.post(url, headers=self.headers,json={'value': str(url_to_shorten)})
+            response = requests.post(url, headers=self.headers, json={'value': str(url_to_shorten)})
             self.assertEqual(response.status_code, 201, f"Expected status code 201, but got {response.status_code}")
             self.assertIsNotNone(response.text, "Response text should not be None.")
             response_extracted = response.json()
-            id_returned = response_extracted["id"]  # TODO add try catch / handle in case no id key was returned
+            id_returned = response_extracted["id"]
             return id_returned
 
         self.id_shortened_url_1 = do_post(self.url_to_shorten_1)
@@ -47,7 +60,7 @@ class TestApi(unittest.TestCase):
         endpoint = "/"
         url = f"{self.base_url}{endpoint}"
         response = requests.delete(url, headers=self.headers)
-        # self.assertEqual(response.status_code, 404, f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
+        self.assertEqual(response.status_code, 404, f"Expected status code 404 to confirm correct erase, but got {response.status_code}")
 
     """
     /:id GET  
@@ -89,15 +102,14 @@ class TestApi(unittest.TestCase):
     def test_put_id(self):
         id = self.id_shortened_url_1
         url_to_update = self.id_shortened_url_1
-        url_after_update = "https://en.wikipedia.org/wiki/Cypherpunk"
-        not_existing_id = "not_existing_id"
-        invalid_url = "pip_install_requests"
+        url_after_update = self.url_after_update
+        not_existing_id = self.not_existing_id
+        invalid_url = self.invalid_url
 
         endpoint = "/"
         url = f"{self.base_url}{endpoint}{id}"
         response = requests.put(url, headers=self.headers_wrong, data=json.dumps({'url': url_after_update}))
         self.assertEqual(response.status_code, 403, f"Expected status code 403, but got {response.status_code}")
-
 
         url = f"{self.base_url}{endpoint}{id}"
         response = requests.put(url, headers=self.headers, data=json.dumps({'url': url_after_update}))
