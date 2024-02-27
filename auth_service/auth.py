@@ -1,6 +1,5 @@
 import sqlite3
 
-JWT_table = {}
 
 sql_create_users_table = """ CREATE TABLE IF NOT EXISTS users (
                                     username text PRIMARY KEY,

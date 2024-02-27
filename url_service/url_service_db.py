@@ -1,4 +1,4 @@
-from utils import generate_short_id, JWT_Table, is_jwt_expired
+from utils import generate_short_id, is_jwt_expired, validate_jwt
 import threading
 import sqlite3
 
@@ -21,9 +21,9 @@ lock = threading.Lock()
 MAX_ATTEMPTS = 1000
 
 def create_short_url(url: str, authorization_header: str, id_length: int):
-    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
+    if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return None
-    username = JWT_Table[authorization_header]
+    username = validate_jwt(authorization_header)
 
     conn = sqlite3.connect('user_auth.db')
     cursor = conn.cursor()
@@ -53,9 +53,9 @@ def get_short_url_by_id(urlid: str):
         return None
 
 def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
-    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
+    if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return None
-    username = JWT_Table[authorization_header]
+    username = validate_jwt(authorization_header)
 
     conn = sqlite3.connect('user_auth.db')
     cursor = conn.cursor()
@@ -72,9 +72,9 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
         return None
 
 def delete_short_url(url_id: str, authorization_header: str):
-    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
+    if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return 403
-    username = JWT_Table[authorization_header]
+    username = validate_jwt(authorization_header)
 
     conn = sqlite3.connect('user_auth.db')
     cursor = conn.cursor()
@@ -91,7 +91,7 @@ def delete_short_url(url_id: str, authorization_header: str):
         return 404
 
 def get_all_short_urls(authorization_header: str):
-    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
+    if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return 403
 
     conn = sqlite3.connect('user_auth.db')
@@ -102,7 +102,7 @@ def get_all_short_urls(authorization_header: str):
     return urls
 
 def delete_all_short_urls(authorization_header: str):
-    if authorization_header not in JWT_Table or is_jwt_expired(authorization_header):
+    if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return 403
 
     conn = sqlite3.connect('user_auth.db')

@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify
 
 # from url_service import utils
-from auth import register_user, user_login, password_change, JWT_table
-from auth_util import JWT_generate, notify_url_service
+from auth import register_user, user_login, password_change
+from auth_util import JWT_generate
 
 app = Flask(__name__)
 
@@ -61,8 +61,7 @@ def login_user():
             header = request.headers.to_wsgi_list()
             payload = request.json
             JWT_token = JWT_generate(header, payload)
-            JWT_table[JWT_token] = username
-            notify_url_service(JWT_token, username)
+            # notify_url_service(JWT_token, username)
             return jsonify({'token': JWT_token}), 200
         elif status_code == 400:
             return jsonify({'detail': 'database error'}), 400

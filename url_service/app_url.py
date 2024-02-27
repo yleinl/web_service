@@ -3,7 +3,7 @@ import json
 from flask import Flask, request, jsonify
 from url_service_db import create_short_url, get_short_url_by_id, update_long_url_by_id, delete_short_url, \
     get_all_short_urls, delete_all_short_urls
-from utils import is_valid_url, JWT_Table
+from utils import is_valid_url
 app = Flask(__name__)
 
 
@@ -155,15 +155,15 @@ def delete_all():
 trust_source = ['127.0.0.1', '145.100.135.223', '145.100.135.224', '145.100.135.147']
 
 
-@app.route("/authorization", methods=["POST"])
-def handle_notification():
-    # if request.remote_addr not in trust_source and not request.remote_addr.startswith("10."):
-    #     return "Not Found", 404
-    data = request.get_json()
-    jwt_token = data.get("jwt")
-    username = data.get("username")
-    JWT_Table[jwt_token] = username
-    return "authorization received", 200
+# @app.route("/authorization", methods=["POST"])
+# def handle_notification():
+#     # if request.remote_addr not in trust_source and not request.remote_addr.startswith("10."):
+#     #     return "Not Found", 404
+#     data = request.get_json()
+#     jwt_token = data.get("jwt")
+#     username = data.get("username")
+#     JWT_Table[jwt_token] = username
+#     return "authorization received", 200
 
 
 if __name__ == '__main__':

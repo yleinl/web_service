@@ -7,22 +7,6 @@ import hashlib
 import hmac
 
 
-def notify_url_service(jwt_token, username):
-    """
-    Notify the url shorten service with a JWT token and username for authentication.
-    :param jwt_token: The JWT token to send.
-    :param username: The username associated with the JWT token.
-    """
-    business_service_url = "http://145.100.135.223:30000/url-shorten/authorization"
-    # business_service_url = "http://127.0.0.1:5000/authorization"
-    payload = {'jwt': jwt_token, 'username': username}
-    response = requests.post(business_service_url, json=payload)
-    if response.status_code == 200:
-        print("Notification sent successfully")
-    else:
-        print("Failed to send notification")
-
-
 """
 generate a JWT token with the header and payload
 """
