@@ -3,6 +3,8 @@ import json
 import string
 import re
 import time
+import hashlib
+import hmac
 
 
 BASE62 = string.digits + string.ascii_letters
@@ -86,34 +88,46 @@ def is_jwt_expired(token):
             return True
     return False
 
+def generate_signature(encoded_header, encoded_payload):
+    """
+    Use the encoded header and payload to generate a local signature to compare
+    :param encoded_header: encoded header.
+    :param encoded_payload: encoded payload.
+    :return: username if the JWT token is valid, False otherwise.
+    """
+    secret_key = 'wscs_is_very_nice'
+    signature = hmac.new(secret_key.encode(), f"{encoded_header}.{encoded_payload}".encode(), hashlib.sha256).digest()
+    encoded_signature = base64.urlsafe_b64encode(signature).decode()
+    return encoded_signature
 
 
-def verify_jwt(jwt_token, secret_key):
+def validate_jwt(jwt_token):
     """
     Verify the validity of a JWT token.
     :param jwt_token: The JWT token to verify.
-    :param secret_key: The secret key used for signing the JWT token.
-    :return: True if the JWT token is valid, False otherwise.
+    :return: username if the JWT token is valid, False otherwise.
     """
     try:
-        encoded_header, encoded_payload, encoded_signature = jwt_token.split('.')
-
-        # Decode header and payload
-        header = json.loads(base64.urlsafe_b64decode(encoded_header.encode()).decode())
-        payload = json.loads(base64.urlsafe_b64decode(encoded_payload.encode()).decode())
-
-        # Recalculate signature
-        signature = hmac.new(secret_key.encode(), f"{encoded_header}.{encoded_payload}".encode(),
-                             hashlib.sha256).digest()
-        recalculated_signature = base64.urlsafe_b64encode(signature).decode()
-
-        # Compare signatures
-        if recalculated_signature == encoded_signature:
-            # Check expiration time
-            current_time = int(time.time())
-            if 'exp' in payload and payload['exp'] >= current_time:
-                return True
+        # split JWT Token to Header、Payload and Signature
+        parts = jwt_token.split('.')
+        encoded_header = parts[0]
+        encoded_payload = parts[1]
+        signature = parts[2]
+    
+        # decode token wirh base64
+        decoded_header = base64.urlsafe_b64decode(encoded_header + '=' * ((4 - len(encoded_header) % 4) % 4)).decode()
+        decoded_payload = base64.urlsafe_b64decode(encoded_payload + '=' * ((4 - len(encoded_payload) % 4) % 4)).decode()
+    
+        # recaluculate the signature 
+        recalculated_signature = generate_signature(encoded_header, encoded_payload)
+    
+        # use the recalculated signature to check with the one extracted from token 
+        if recalculated_signature == signature:
+            print("Token validation successful.")
+            return json.loads(decoded_payload)['username']
+        else:
+            print("Token validation failed.")
+            return False
     except Exception as e:
         print("Error verifying JWT:", str(e))
-
     return False
