@@ -85,3 +85,35 @@ def is_jwt_expired(token):
         if int(exp) < time.time():
             return True
     return False
+
+
+
+def verify_jwt(jwt_token, secret_key):
+    """
+    Verify the validity of a JWT token.
+    :param jwt_token: The JWT token to verify.
+    :param secret_key: The secret key used for signing the JWT token.
+    :return: True if the JWT token is valid, False otherwise.
+    """
+    try:
+        encoded_header, encoded_payload, encoded_signature = jwt_token.split('.')
+
+        # Decode header and payload
+        header = json.loads(base64.urlsafe_b64decode(encoded_header.encode()).decode())
+        payload = json.loads(base64.urlsafe_b64decode(encoded_payload.encode()).decode())
+
+        # Recalculate signature
+        signature = hmac.new(secret_key.encode(), f"{encoded_header}.{encoded_payload}".encode(),
+                             hashlib.sha256).digest()
+        recalculated_signature = base64.urlsafe_b64encode(signature).decode()
+
+        # Compare signatures
+        if recalculated_signature == encoded_signature:
+            # Check expiration time
+            current_time = int(time.time())
+            if 'exp' in payload and payload['exp'] >= current_time:
+                return True
+    except Exception as e:
+        print("Error verifying JWT:", str(e))
+
+    return False

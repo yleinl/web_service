@@ -157,8 +157,8 @@ trust_source = ['127.0.0.1', '145.100.135.223', '145.100.135.224', '145.100.135.
 
 @app.route("/authorization", methods=["POST"])
 def handle_notification():
-    if request.remote_addr not in trust_source and not request.remote_addr.startswith("10."):
-        return "Not Found", 404
+    # if request.remote_addr not in trust_source and not request.remote_addr.startswith("10."):
+    #     return "Not Found", 404
     data = request.get_json()
     jwt_token = data.get("jwt")
     username = data.get("username")
@@ -167,5 +167,5 @@ def handle_notification():
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
-    # app.run(host='0.0.0.0', port=5000)
+    # app.run(port=5000)
+    app.run(host='0.0.0.0', port=5000)

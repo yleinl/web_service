@@ -13,7 +13,8 @@ def notify_url_service(jwt_token, username):
     :param jwt_token: The JWT token to send.
     :param username: The username associated with the JWT token.
     """
-    business_service_url = "http://127.0.0.1:5000/authorization"
+    business_service_url = "http://145.100.135.223:30000/url-shorten/authorization"
+    # business_service_url = "http://127.0.0.1:5000/authorization"
     payload = {'jwt': jwt_token, 'username': username}
     response = requests.post(business_service_url, json=payload)
     if response.status_code == 200:
