@@ -9,6 +9,8 @@ class TestApi(unittest.TestCase):
     # modify this to your local server settings
     base_url = "http://145.100.135.223:30000/url-shorten"
     auth_url = "http://145.100.135.223:30000/url-auth"
+    # base_url = "http://127.0.0.1:5000"
+    # auth_url = "http://127.0.0.1:5001"
     end_point = "/"
     test_username = "test"
     test_password = "test"

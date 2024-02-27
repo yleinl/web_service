@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+
+      containers:
+      - name: url-shorten
+        image: wujianchun123/web_image:latest
+        command: ["python3", "./url_service/app_url.py"]
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: data
+          mountPath: /home/web-service/db
+      - name: url-auth
+        image: wujianchun123/web_image:latest
+        command: ["python3", "./auth_service/app_auth.py"]
+        ports:
+        - containerPort: 5001
+        volumeMounts:
+        - name: data
+          mountPath: /home/web-service/db
+      volumes:
+      - name: data
+        nfs:
+          #server: "nfs-service.default.svc.cluster.local"
+          server: 192.168.196.227
+          path: "/web"

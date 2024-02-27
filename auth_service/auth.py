@@ -54,7 +54,7 @@ def register_user(username, password):
              201 for successful registration, 409 if the username already exists,
              400 for database errors or inability to create a database connection.
     """
-    conn = create_connection('user_auth.db')
+    conn = create_connection('./db/user_auth.db')
     if conn is not None:
         cursor = conn.cursor()
         cursor.execute(sql_create_users_table)
@@ -90,7 +90,7 @@ def user_login(username, password):
              200 for successful login, 403 for incorrect password, or username not found,
              400 for database errors or inability to create a database connection.
     """
-    conn = create_connection('user_auth.db')
+    conn = create_connection('./db/user_auth.db')
     if conn is not None:
         cursor = conn.cursor()
 
@@ -133,7 +133,7 @@ def password_change(username, password):
              200 for successful password change, 403 if the username doesn't exist,
              400 for database errors or inability to create a database connection.
     """
-    conn = create_connection('user_auth.db')
+    conn = create_connection('./db/user_auth.db')
     if conn is not None:
         cursor = conn.cursor()
 

@@ -3,7 +3,7 @@ import threading
 import sqlite3
 
 def init_db():
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS short_urls (
@@ -25,7 +25,7 @@ def create_short_url(url: str, authorization_header: str, id_length: int):
         return None
     username = validate_jwt(authorization_header)
 
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
 
     for attempt in range(MAX_ATTEMPTS):
@@ -42,7 +42,7 @@ def create_short_url(url: str, authorization_header: str, id_length: int):
     raise Exception("Failed to generate a unique short ID after maximum attempts.")
 
 def get_short_url_by_id(urlid: str):
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
     cursor.execute('SELECT url_id, long_url, username FROM short_urls WHERE url_id = ?', (urlid,))
     row = cursor.fetchone()
@@ -57,7 +57,7 @@ def update_long_url_by_id(url_id: str, new_url: str, authorization_header: str):
         return None
     username = validate_jwt(authorization_header)
 
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
     cursor.execute('SELECT username FROM short_urls WHERE url_id = ?', (url_id,))
     row = cursor.fetchone()
@@ -76,7 +76,7 @@ def delete_short_url(url_id: str, authorization_header: str):
         return 403
     username = validate_jwt(authorization_header)
 
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
     cursor.execute('SELECT username FROM short_urls WHERE url_id = ?', (url_id,))
     row = cursor.fetchone()
@@ -94,7 +94,7 @@ def get_all_short_urls(authorization_header: str):
     if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return 403
 
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
     cursor.execute('SELECT url_id, long_url, username FROM short_urls')
     urls = [{'id': row[0], 'long_url': row[1], 'username': row[2]} for row in cursor.fetchall()]
@@ -105,7 +105,7 @@ def delete_all_short_urls(authorization_header: str):
     if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return 403
 
-    conn = sqlite3.connect('user_auth.db')
+    conn = sqlite3.connect('./db/user_auth.db')
     with lock:
         cursor = conn.cursor()
         cursor.execute('DELETE FROM short_urls')
