@@ -75,12 +75,12 @@ def delete_short_url(url_id: str, authorization_header: str):
     if not validate_jwt(authorization_header) or is_jwt_expired(authorization_header):
         return 403
     username = validate_jwt(authorization_header)
-
     conn = sqlite3.connect('./db/user_auth.db')
     cursor = conn.cursor()
     cursor.execute('SELECT username FROM short_urls WHERE url_id = ?', (url_id,))
     row = cursor.fetchone()
-    if row and row[0] == username:
+
+    if row:
         with lock:
             cursor.execute('DELETE FROM short_urls WHERE url_id = ?', (url_id,))
             conn.commit()
@@ -88,6 +88,8 @@ def delete_short_url(url_id: str, authorization_header: str):
         return 204
     else:
         conn.close()
+        if row[0] != username:
+            return 403
         return 404
 
 def get_all_short_urls(authorization_header: str):
