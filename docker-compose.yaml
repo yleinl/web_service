@@ -7,8 +7,6 @@ services:
       - ./db:/home/web_service/db
     ports:
       - "5000:5000"
-    environment:
-      - SERVICE_TYPE=shorten
     depends_on:
       - url_auth
     command: python3 ./url_service/app_url.py
@@ -19,6 +17,4 @@ services:
       - ./db:/home/web_service/db
     ports:
       - "5001:5001"
-    environment:
-      - SERVICE_TYPE=auth
     command: python3 ./auth_service/app_auth.py
