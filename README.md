@@ -30,18 +30,22 @@ This document provides an overview and setup guide for a REST API project design
 
 ### Docker vitrualization
 1. **For url shorten service**
+ ```bash
 cd url_service
 docker build -t url_service:latest .
-
+```
 2. **For authentication service**
+ ```bash
 cd auth_service
 docker build -t auth_service:latest .
-
+```
 3. **Docker Compose**
+ ```bash
 In this dicrectory
 docker-compose up
-
+```
 ### Kubenetes Deployment
+ ```bash
 cd yaml
 kubectl apply -f deployment.yaml
 kubectl apply -f nfs-server-deploy.yaml
@@ -51,4 +55,4 @@ kubectl apply -f nginx-deployment.yaml
 kubectl apply -f nginx-service.yaml
 kubectl apply -f service1.yaml
 kubectl apply -f service2.yaml
-
+```
