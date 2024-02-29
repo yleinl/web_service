@@ -1,7 +1,7 @@
 FROM python:3.10-slim
 
-WORKDIR /home/web-service
+WORKDIR /home/url_service
 
-COPY . /home/web-service
+COPY . /home/url_service
 
 RUN pip install --no-cache-dir Flask requests

@@ -2,19 +2,19 @@ version: '3'
 
 services:
   url_shorten:
-    image: web_image:latest
+    image: wujianchun123/url_service:latest
     volumes:
-      - ./db:/home/web_service/db
+      - ../db:/home/url_service/db
     ports:
       - "5000:5000"
     depends_on:
       - url_auth
-    command: python3 ./url_service/app_url.py
+    command: python3 ./app_url.py
 
   url_auth:
-    image: web_image:latest
+    image: wujianchun123/auth_service:latest
     volumes:
-      - ./db:/home/web_service/db
+      - ../db:/home/auth_service/db
     ports:
       - "5001:5001"
-    command: python3 ./auth_service/app_auth.py
+    command: python3 ./app_auth.py
