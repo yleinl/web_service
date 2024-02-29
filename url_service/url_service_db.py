@@ -81,6 +81,8 @@ def delete_short_url(url_id: str, authorization_header: str):
     row = cursor.fetchone()
 
     if row:
+        if row[0] != username:
+            return 403
         with lock:
             cursor.execute('DELETE FROM short_urls WHERE url_id = ?', (url_id,))
             conn.commit()
@@ -88,8 +90,6 @@ def delete_short_url(url_id: str, authorization_header: str):
         return 204
     else:
         conn.close()
-        if row[0] != username:
-            return 403
         return 404
 
 def get_all_short_urls(authorization_header: str):

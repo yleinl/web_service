@@ -4,7 +4,7 @@ services:
   url_shorten:
     image: web_image:latest
     volumes:
-      - .:/home/web_service
+      - ./db:/home/web_service/db
     ports:
       - "5000:5000"
     environment:
@@ -16,7 +16,7 @@ services:
   url_auth:
     image: web_image:latest
     volumes:
-      - .:/home/web_service
+      - ./db:/home/web_service/db
     ports:
       - "5001:5001"
     environment:
